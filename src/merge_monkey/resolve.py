@@ -66,6 +66,7 @@ class ResolveResult:
     unresolved_files: list[str] = field(default_factory=list)
     commit: str | None = None
     operation: str = ""
+    empty: bool = False     # resolution leaves nothing to commit (pick/revert only)
 
     @property
     def complete(self) -> bool:
@@ -116,6 +117,12 @@ def resolve_worktree(repo: Repo, strategy: str = "tested", ai=None,
             result.unresolved_files.append(fc.path)
 
     if not result.complete or not commit:
+        return result
+
+    if analysis["operation"] in ("cherry-pick", "revert") and repo.ok("diff", "--cached", "--quiet", "HEAD"):
+        # Keeping only our side undid the whole pick/revert. git refuses an
+        # empty commit here, so leave the choice of --skip to the user.
+        result.empty = True
         return result
 
     gd = repo.git_dir
