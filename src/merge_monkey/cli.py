@@ -177,7 +177,7 @@ def cmd_resolve(repo: Repo, a) -> int:
     chooser = _interactive_chooser if a.interactive else None
     res = resolve_worktree(repo, a.prefer, ai=ai, chooser=chooser, commit=not a.no_commit)
     if a.json:
-        emit_json({"operation": res.operation, "commit": res.commit,
+        emit_json({"operation": res.operation, "commit": res.commit, "empty": res.empty,
                    "unresolved": res.unresolved_files,
                    "decisions": [d.__dict__ for d in res.decisions]})
         return 0 if res.complete else 1
@@ -187,6 +187,11 @@ def cmd_resolve(repo: Repo, a) -> int:
     if not res.complete:
         print(c(f"\nLeft for you: {', '.join(res.unresolved_files)} (markers kept where undecided).", "yellow"))
         return 1
+    if res.empty:
+        print("\nThe resolution keeps none of the incoming change, so there is nothing to commit.")
+        print(f"Run `git {res.operation} --skip` to drop it, or edit the files and run "
+              f"`git {res.operation} --continue`.")
+        return 0
     if res.commit:
         print(f"\n✓ Committed {c(res.commit[:10], 'yellow')} with provenance trailers.")
         print(c("  The resolved code is new: run the tests, then `git mm mark HEAD --ci passed`.", "dim"))

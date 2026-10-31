@@ -75,7 +75,9 @@ def predict_picks(repo: Repo, source: str, target: str, analyzer: Analyzer,
         if info.is_merge:
             continue
         match = find_on_branch(repo, sha, target, ai=ai)
-        if match.found:
+        # Only a confirmed match means the change is already there; a "possible
+        # match" must not hide a conflict.
+        if match.found and match.method != "possible match":
             results.append({"sha": sha, "subject": info.subject, "status": "already there",
                             "match": match.to_dict(), "files": []})
             continue

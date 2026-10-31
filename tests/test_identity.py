@@ -99,3 +99,18 @@ def test_same_commit(scratch):
     _base(scratch)
     m = find_on_branch(scratch.repo, "main", "main")
     assert m.method == "same commit"
+
+
+def test_shared_removed_line_is_not_a_match(scratch):
+    """Both branches replaced 'blue' with different colours: not the same change."""
+    s = scratch
+    s.write("index.html", "<div>\n<p style=\"color:blue\"></p>\n</div>\n")
+    s.commit("blue")
+    s.git("branch", "mine")
+    s.write("index.html", "<div>\n<p style=\"color:green\"></p>\n</div>\n")
+    s.commit("green")
+    s.git("checkout", "-q", "mine")
+    s.write("index.html", "<div>\n<p style=\"color:red\"></p>\n</div>\n")
+    red = s.commit("red")
+    m = find_on_branch(s.repo, red, "main")
+    assert not m.found

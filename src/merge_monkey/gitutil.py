@@ -60,7 +60,7 @@ class Repo:
     def run(self, *args: str, input: str | None = None, env: dict | None = None) -> str:
         res = self.run_raw(*args, input=input, env=env)
         if res.code != 0:
-            raise GitError(list(args), res.code, res.err)
+            raise GitError(list(args), res.code, res.err.strip() or res.out)
         return res.out
 
     def ok(self, *args: str) -> bool:
@@ -135,10 +135,14 @@ class Repo:
             ("CHERRY_PICK_HEAD", "cherry-pick"),
             ("MERGE_HEAD", "merge"),
             ("REVERT_HEAD", "revert"),
-            ("REBASE_HEAD", "rebase"),
         ):
             if (gd / name).exists():
                 return op, name
+        # git leaves REBASE_HEAD behind after a rebase ends; only the state
+        # directory says a rebase is still running.
+        rebasing = (gd / "rebase-merge").is_dir() or (gd / "rebase-apply").is_dir()
+        if rebasing and (gd / "REBASE_HEAD").exists():
+            return "rebase", "REBASE_HEAD"
         return None
 
 

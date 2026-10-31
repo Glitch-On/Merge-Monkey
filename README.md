@@ -143,6 +143,13 @@ pytest
 The tests build real git repositories in temporary folders. Gemma is tested against a fake
 Ollama HTTP server, so CI needs no model.
 
+The suite is strict: warnings fail the run, unknown markers or config keys fail, and
+branch coverage must stay at or above 95% (`pytest --cov`). `tests/test_guidelines.py`
+maps tests to Problem 01's evaluation scenarios: Django and CPython backport formats,
+simulated dev/uat/prod repos, edited backports, moving provenance between clones, clones
+without notes, and checking that results are plain git (`git fsck --strict`,
+`git interpret-trailers`).
+
 ## CI/CD
 
 | Workflow | Runs on | What it does |
