@@ -1,0 +1,69 @@
+$ git log -1 --format=%B 8485c6ac386c6d41cf46001851c19360275c7cc9
+[6.1.x] Fixed #37463 -- Fixed attrs mutation in legend_tag().
+
+Regression in 0eec2a163a4b2ea4e82c53ae1d7b71bf43ac911d.
+
+Backport of 817df1c4d6d38f416460d7d9354d7deab9d35139 from main.
+
+
+$ git mm trace 817df1c4d6d38f416460d7d9354d7deab9d35139 --no-ai
+817df1c4d6 Fixed #37463 -- Fixed attrs mutation in legend_tag().  (Jacob Walls)
+  ⚠️  IN PROD, NO TEST RECORD  in prod (inferred from branch), no test record
+
+  stable/6.1.x [prod] 8485c6ac38  backport note (100%)   ⚠️  IN PROD, NO TEST RECORD in prod (inferred from branch), no test record
+                      8485c6ac38 names 817df1c4d6 as its source
+  main         [dev]  817df1c4d6  same commit (100%)   ⚠️  IN PROD, NO TEST RECORD in prod (inferred from branch), no test record
+                      the commit itself is on this branch
+
+$ git mm show 8485c6ac386c6d41cf46001851c19360275c7cc9
+8485c6ac38 [6.1.x] Fixed #37463 -- Fixed attrs mutation in legend_tag().
+  ⚠️  IN PROD, NO TEST RECORD  in prod (inferred from branch), no test record
+    inferred: reachable from prod branch 'stable/6.1.x'
+    inferred: [817df1c4d6] its original (same code) is on dev branch 'main'
+
+$ git mm predict --pick main stable/6.1.x --limit 15
+Changes on main that stable/6.1.x does not have yet:
+
+  CONFLICT 8274ae1c21 Refs #35874 -- Excluded console-tabs.css from epub.
+           docs/conf.py (content, 1 hunk(s))
+  CONFLICT 1c6c7f909d Refs #35874 -- Fixed console tabs overflow in narrow windows.
+           docs/_static/console-tabs.css (modify/delete, 0 hunk(s))
+  CONFLICT a6304ac105 Refs #35874 -- Added EPUBCheck to the documentation build.
+           .github/workflows/docs.yml (content, 1 hunk(s))
+  CONFLICT 0804aed320 Fixed #35899 -- Allowed multiline template tags.
+           django/template/base.py (content, 3 hunk(s))
+           docs/releases/6.2.txt (modify/delete, 0 hunk(s))
+           tests/template_tests/syntax_tests/test_comment.py (content, 1 hunk(s))
+           tests/template_tests/syntax_tests/test_verbatim.py (content, 1 hunk(s))
+  CONFLICT e74c8a808e Refs #35899 -- Added allow_multiline_tags transitional template option to disable multiline template tags.
+           django/template/base.py (content, 4 hunk(s))
+           django/template/engine.py (content, 1 hunk(s))
+           docs/internals/deprecation.txt (content, 1 hunk(s))
+           docs/releases/6.2.txt (modify/delete, 0 hunk(s))
+           tests/template_tests/syntax_tests/test_basic.py (content, 1 hunk(s))
+           tests/template_tests/syntax_tests/test_verbatim.py (content, 1 hunk(s))
+  CONFLICT 8be9c12275 Refs #35225 -- Fixed typo in test skip.
+           django/db/backends/oracle/features.py (content, 1 hunk(s))
+  clean    8aab4fa1ab Refs #37089 -- Added test coverage for ignore_warnings().
+  CONFLICT 2d9d619676 Fixed #37089 -- Made ignore_warnings() match substrings by default.
+           docs/releases/6.2.txt (modify/delete, 0 hunk(s))
+           tests/test_utils/tests.py (content, 1 hunk(s))
+  CONFLICT 1f97f36d78 Ensured docs checks cover same files as docs builds.
+           docs/Makefile (content, 1 hunk(s))
+           docs/conf.py (content, 1 hunk(s))
+           docs/lint.py (content, 1 hunk(s))
+           docs/make.bat (content, 1 hunk(s))
+  CONFLICT e7119cdb6d Refs #35874 -- Excluded console-tabs.css from epub building on Windows.
+           docs/conf.py (content, 1 hunk(s))
+  clean    19f0ac809e Ran docs checks and sphinx_tests on Windows via GitHub Actions.
+  clean    3bdcd29a61 Fixed `make.bat check` to exit non-zero when a check fails.
+  clean    a6a5d1e67a Refs #37271, #37272 -- Doc'd remaining DEP 20 changes for users and releasers.
+  CONFLICT f4c65fd6a5 Fixed #37138 -- Changed docs to use customized pydata-sphinx-theme.
+           docs/_theme/djangodocs/layout.html (modify/delete, 0 hunk(s))
+           docs/_theme/djangodocs/static/djangodocs.css (modify/delete, 0 hunk(s))
+           docs/conf.py (content, 1 hunk(s))
+           docs/requirements.txt (content, 1 hunk(s))
+  clean    a05e16a723 Refs #35514, #37293 -- Corrected removal version for EMAIL_* settings in 6.1 release notes.
+
+  (showing the last 15; use --limit)
+

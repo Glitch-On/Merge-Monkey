@@ -1,0 +1,33 @@
+$ git mm show HEAD
+c868cce393 Fix crash on long sessions (#812)
+  🔁 NEEDS RETEST  in dev (inferred from branch), CI passed (on original; code changed when copied)
+    inferred: reachable from dev branch 'dev'
+    inherited: [9bb60ffb34] deployed to prod by ci-bot at 2026-10-30T09:00:00+00:00 (different code: not counted as deployed)
+    inherited: [9bb60ffb34] ci passed by ci-bot at 2026-10-30T09:00:00+00:00
+    inferred: [9bb60ffb34] its original (code differs) is on prod branch 'prod'
+    inferred: [717cc03e50] its copy (code differs) is on uat branch 'uat'
+
+$ git mm trace hotfix-812 --no-ai
+9bb60ffb34 Fix crash on long sessions (#812)  (Meera Ops)
+  ✅ PROVEN  in prod, CI passed
+
+  prod [prod] 9bb60ffb34  same commit (100%)   ✅ PROVEN in prod, CI passed
+              the commit itself is on this branch
+  uat  [uat]  717cc03e50  cherry-pick trailer (100%)   ✅ PROVEN in prod (via linked commit), CI passed (on identical original)
+              717cc03e50 names 9bb60ffb34 as its source
+  dev  [dev]  c868cce393  cherry-pick trailer (100%)   🔁 NEEDS RETEST in dev (inferred from branch), CI passed (on original; code changed when copied)
+              c868cce393 names 9bb60ffb34 as its source
+
+$ git mm mark HEAD --ci passed --by dev-ci
+✓ Recorded on c868cce393: ci=passed, by=dev-ci
+
+$ git mm show HEAD
+c868cce393 Fix crash on long sessions (#812)
+  ✅ TESTED  in dev (inferred from branch), CI passed
+    recorded: ci passed by dev-ci at 2026-10-31T19:10:18+00:00
+    inferred: reachable from dev branch 'dev'
+    inherited: [9bb60ffb34] deployed to prod by ci-bot at 2026-10-30T09:00:00+00:00 (different code: not counted as deployed)
+    inherited: [9bb60ffb34] ci passed by ci-bot at 2026-10-30T09:00:00+00:00
+    inferred: [9bb60ffb34] its original (code differs) is on prod branch 'prod'
+    inferred: [717cc03e50] its copy (code differs) is on uat branch 'uat'
+

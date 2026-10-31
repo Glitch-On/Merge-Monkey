@@ -1,0 +1,66 @@
+$ git log -1 --format=%B 3524941630e0f390b03de633a975b57378449a34
+[3.15] Disable UBSan alignment check in `configure`'s aligned-access test (GH-161012) (#161019)
+
+(cherry picked from commit 90dc8bdc09b7b20c4206fec7f119d5bac5d48c52)
+
+Co-authored-by: Stan Ulbrych <stan@python.org>
+
+$ git mm trace 90dc8bdc09b7b20c4206fec7f119d5bac5d48c52 --no-ai
+90dc8bdc09 Disable UBSan alignment check in `configure`'s aligned-access test (#161012)  (Stan Ulbrych)
+  ⚠️  IN PROD, NO TEST RECORD  in prod (inferred from branch), no test record
+
+  3.15 [prod] 3524941630  cherry-pick trailer (100%)   ⚠️  IN PROD, NO TEST RECORD in prod (inferred from branch), no test record
+              3524941630 names 90dc8bdc09 as its source
+  main [dev]  90dc8bdc09  same commit (100%)   ⚠️  IN PROD, NO TEST RECORD in prod (inferred from branch), no test record
+              the commit itself is on this branch
+
+$ git mm predict --pick main 3.15 --limit 10 -v
+Changes on main that 3.15 does not have yet:
+
+  clean    99d382c247 gh-159500: Speed up asyncio StreamReader.readline() and readuntil() (#159505)
+  clean    974a7f70b3 gh-135385: do not reserve inline values for attributes stored in slots (#156656)
+  clean    07db3e96d8 gh-87613: Use AC vectorcall for slice() (#159471)
+  clean    4aab0c4ea2 gh-157746: Make PyErr_CheckSignals() cheap when no signal is pending (#157748)
+  clean    5ffbce74e3 gh-160473: Improve performance of exception raise (#160476)
+  CONFLICT f32067f482 gh-160837: Fix asyncio call graph truncation at async generators (#160839)
+           Lib/asyncio/graph.py (content, 1 hunk(s))
+  CONFLICT ba3357c6d3 regenerate clinic for sliceobject.c.h (#160997)
+           Objects/clinic/sliceobject.c.h (modify/delete, 0 hunk(s))
+  clean    1259f1602f gh-160518: Fix hz encoder dropping half of the ~~ escape (GH-160519)
+  clean    2cf2dd60df gh-50720: Set errno and strerror on URLError wrapping an OSError (#160938)
+  clean    65665a4aba gh-160506: Fix ntpath.realpath() for broken links via directory links (GH-160507)
+
+  (showing the last 10; use --limit)
+
+━━━ Lib/asyncio/graph.py · conflict 1 of 1 · line 68 ━━━━━━━━━━━━━━━━━━━
+OURS  [ours: 3.15]
+  │ (lines deleted on this side)
+  3105a3498a [3.15] gh-157265: tarfile: Honor None result of filter for link fallbacks (GH-157266) (#157309)
+    by Miss Islington (bot) · on: prod
+    ⚠️  IN PROD, NO TEST RECORD  in prod (inferred from branch), no test record
+      inferred: reachable from prod branch '3.15'
+
+THEIRS  [theirs: f32067f482]
+  │         elif hasattr(coro, 'gi_yieldfrom'):
+  │             # A generator, e.g. returned by __await__ or @types.coroutine
+  │             if coro.gi_frame is not None:
+  │                 st.append(FrameCallGraphEntry(coro.gi_frame))
+  │             coro = coro.gi_yieldfrom
+  │         elif hasattr(coro, 'aga_gen'):
+  │             # An asend()/athrow() awaitable: step over it to its generator
+  │             coro = coro.aga_gen
+  c79146a9eb gh-160804: Support generator based awaitables in asyncio introspection (#160805)
+    by Kumar Aditya · on: dev
+    ❓ UNVERIFIED  in dev (inferred from branch), no test record
+      inferred: reachable from dev branch 'main'
+  f32067f482 gh-160837: Fix asyncio call graph truncation at async generators (#160839)
+    by Michael J. Sullivan · on: dev
+    ❓ UNVERIFIED  in dev (inferred from branch), no test record
+      inferred: reachable from dev branch 'main'
+
+Provenance says: Prefer OURS: in prod, no test record vs unverified on theirs. Keep any genuinely new lines from theirs only after testing them.
+
+━━━ Objects/clinic/sliceobject.c.h · modify/delete conflict ━━━━━━━━━━━━
+
+  CONFLICT (modify/delete): Objects/clinic/sliceobject.c.h deleted in f254c47898e7de07881b39cc32e0036caf606bea and modified in ba3357c6d31568e1454c302f1804e2b7ee3b90d5.  Version ba3357c6d31568e1454c302f1804e2b7ee3b90d5 of Objects/clinic/sliceobject.c.h left in tree.
+
