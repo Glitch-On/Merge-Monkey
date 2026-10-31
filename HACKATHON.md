@@ -5,8 +5,8 @@
 - Team name: xyz
 - Project name: Merge Monkey
 - Members:
-  - Vansh
-
+  - Vansh Gaur
+  - Simran Sobhani
 ## Problem statement
 
 Problem 01: Intelligent Git Conflict Resolution with Testing Provenance
