@@ -233,8 +233,13 @@ def find_on_branch(repo: Repo, sha: str, branch: str, ai=None) -> Match:
             if pids.get(cand.sha) == src_pid:
                 return Match(branch, cand.sha, "patch-id", 0.95, "identical diff, different commit")
 
+    src_added = {l for l in source.lines if l[0] == "+"}
     best, best_score = None, 0.0
     for cand in candidates:
+        # Sharing only removed lines means both commits replaced the same old
+        # code, not that they made the same change.
+        if src_added and not (src_added & {l for l in cand.lines if l[0] == "+"}):
+            continue
         score = similarity(source.lines, cand.lines)
         same_subject = bool(meta.subject_key) and cand.meta.subject_key == meta.subject_key
         shared_refs = bool(meta.refs & cand.meta.refs)

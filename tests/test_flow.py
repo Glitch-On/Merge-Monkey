@@ -139,3 +139,18 @@ def test_report(demo):
     assert hot["cells"]["dev"] is None
     assert hot["cells"]["prod"]["verdict"] == "PROVEN"
     assert "<table>" in render_html(data)
+
+
+def test_predict_picks_reports_conflict_not_present(scratch):
+    s = scratch
+    s.write("index.html", "<p style=\"color:blue\"></p>\n")
+    s.commit("blue")
+    s.git("branch", "mine")
+    s.write("index.html", "<p style=\"color:green\"></p>\n")
+    s.commit("green")
+    s.git("checkout", "-q", "mine")
+    s.write("index.html", "<p style=\"color:red\"></p>\n")
+    red = s.commit("red")
+    res = predict_picks(s.repo, "mine", "main", Analyzer(s.repo))
+    (pick,) = res["picks"]
+    assert pick["sha"] == red and pick["status"] == "conflict"
