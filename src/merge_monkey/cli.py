@@ -14,7 +14,7 @@ from .envs import configured_envs, set_env
 from .gitutil import GitError, Repo
 from .predict import predict_merge, predict_picks
 from .provenance import NOTES_REF, lookup, mark
-from .render import c, file_conflicts, provenance_block, rule, verdict
+from .render import c, file_conflicts, provenance_block, verdict
 from .resolve import STRATEGIES, choose, resolve_worktree
 
 
