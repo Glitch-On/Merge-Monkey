@@ -7,6 +7,7 @@ export NO_COLOR=1
 WORK="$(mktemp -d)/mm-demo"
 OUT="${1:-gemma-output}"
 mkdir -p "$OUT"
+OUT="$(cd "$OUT" && pwd)"   # absolute, because the script changes directory below
 
 git mm demo "$WORK" > /dev/null
 cd "$WORK"
