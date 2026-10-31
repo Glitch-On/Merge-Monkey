@@ -143,6 +143,17 @@ pytest
 The tests build real git repositories in temporary folders. Gemma is tested against a fake
 Ollama HTTP server, so CI needs no model.
 
+## CI/CD
+
+| Workflow | Runs on | What it does |
+|---|---|---|
+| `ci.yml` | every pull request and push to `main` | secret scan, `ruff` lint, tests on Python 3.10, 3.12 and 3.13, the demo backport end to end, then builds the wheel and runs it from a clean venv |
+| `gemma.yml` | manual run, or a PR that changes the Gemma code | starts Ollama, pulls `gemma4:e2b`, and checks that Gemma explains and resolves the demo conflict |
+| `release.yml` | pushing a `v*` tag | runs the tests, builds the package and attaches it to a GitHub release |
+
+`scripts/check_secrets.sh` fails the build if anything shaped like an API key, token or
+private key is tracked. The only token the workflows use is GitHub's built-in `GITHUB_TOKEN`.
+
 ## Limits
 
 - `predict --pick` checks each missing commit against the current target on its own. Picking several in a row can change later results.

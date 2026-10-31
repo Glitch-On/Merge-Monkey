@@ -1,0 +1,57 @@
+name: Gemma
+
+# Runs Merge Monkey against a real Gemma model served by Ollama, to show the
+# model is called by the code, not only mocked in unit tests. It downloads the
+# model, so it runs on demand and when the Gemma code changes, separate from CI.
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "Ollama model tag"
+        default: "gemma4:e2b"
+  pull_request:
+    paths:
+      - "src/merge_monkey/ai.py"
+      - "scripts/gemma_smoke.sh"
+      - ".github/workflows/gemma.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  gemma:
+    name: Real Gemma run
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      # e2b is the small Gemma 4 variant; it fits a CI runner's memory and disk.
+      MM_MODEL: ${{ inputs.model || 'gemma4:e2b' }}
+      OLLAMA_HOST: http://localhost:11434
+    services:
+      ollama:
+        image: ollama/ollama
+        ports:
+          - 11434:11434
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: python -m pip install -e .
+      - name: Pull the model
+        run: |
+          docker exec ${{ job.services.ollama.id }} ollama pull "$MM_MODEL"
+          docker exec ${{ job.services.ollama.id }} ollama list
+      - name: Configure git identity
+        run: |
+          git config --global user.name "CI"
+          git config --global user.email "ci@example.com"
+      - name: Explain and resolve the demo conflict with Gemma
+        run: scripts/gemma_smoke.sh gemma-output
+      - name: Upload Gemma output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gemma-output
+          path: gemma-output/
