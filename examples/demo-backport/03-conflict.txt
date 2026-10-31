@@ -1,0 +1,31 @@
+$ git cherry-pick -x hotfix-812
+Auto-merging settings.py
+CONFLICT (content): Merge conflict in settings.py
+error: could not apply 9bb60ff... Fix crash on long sessions (#812)
+hint: After resolving the conflicts, mark them with
+hint: "git add/rm <pathspec>", then run
+hint: "git cherry-pick --continue".
+hint: You can instead skip this commit with "git cherry-pick --skip".
+hint: To abort and get back to the state before "git cherry-pick",
+hint: run "git cherry-pick --abort".
+hint: Disable this message with "git config set advice.mergeConflict false"
+
+$ cat settings.py
+# Application settings
+DEBUG = False
+
+# Sessions
+<<<<<<< HEAD
+SESSION_TIMEOUT = 7200
+SESSION_WARN_BEFORE_EXPIRY = True
+=======
+SESSION_TIMEOUT = 1800
+>>>>>>> 9bb60ff (Fix crash on long sessions (#812))
+
+# Database
+DB_POOL_SIZE = 5
+DB_TIMEOUT = 30
+
+# Uploads
+MAX_UPLOAD_MB = 25
+

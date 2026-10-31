@@ -1,0 +1,35 @@
+$ git mm resolve --prefer tested --no-ai
+✓ settings.py hunk 1: theirs (proven)
+
+✓ Committed c868cce393 with provenance trailers.
+  The resolved code is new: run the tests, then `git mm mark HEAD --ci passed`.
+
+$ git log -1
+commit c868cce393ff4c2f92fd8690cf59485d8601a028
+Author: Meera Ops <meera@example.com>
+Date:   Sat Oct 31 04:14:00 2026 +0530
+
+    Fix crash on long sessions (#812)
+    
+    Sessions older than an hour hit a token refresh bug.
+    
+    (cherry picked from commit 9bb60ffb343d30c9da2beb1d7439d560f90f7909)
+    
+    Merge-Monkey-Ours: a79204399d0031052a2e1f07ebf16390329e4f15 UNVERIFIED (in dev (inferred from branch), no test record)
+    Merge-Monkey-Theirs: 9bb60ffb343d30c9da2beb1d7439d560f90f7909 PROVEN (in prod, CI passed)
+    Merge-Monkey-Resolution: settings.py hunk 1 -> theirs (proven)
+
+$ cat settings.py
+# Application settings
+DEBUG = False
+
+# Sessions
+SESSION_TIMEOUT = 1800
+
+# Database
+DB_POOL_SIZE = 5
+DB_TIMEOUT = 30
+
+# Uploads
+MAX_UPLOAD_MB = 25
+

@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Merge Monkey ledger</title>
+<style>
+ body { font: 14px/1.4 system-ui, sans-serif; margin: 2rem; color: #1d1d1f; }
+ table { border-collapse: collapse; }
+ th, td { border: 1px solid #ddd; padding: .5rem .8rem; text-align: center; }
+ td.subj { text-align: left; max-width: 28rem; }
+ .ok { background: #e7f6ec; } .unk { background: #fdeaea; }
+ .bad { background: #f8d0d0; } .warn { background: #fff6dc; } .miss { background: #f2f2f2; color: #888; }
+ code { color: #666; font-size: 12px; }
+</style></head><body>
+<h1>Merge Monkey ledger</h1>
+<p>Each row is one change, matched across branches by cherry-pick trailers and patch-id.
+Hover a cell for details.</p>
+<table><tr><th>Change</th><th>prod<br><small>prod</small></th><th>uat<br><small>uat</small></th><th>dev<br><small>dev</small></th></tr>
+<tr><td class='subj'>Fix crash on long sessions (#812)<br><code>9bb60ffb</code></td><td class="ok" title="9bb60ffb34: in prod, CI passed">✅ proven<br><code>9bb60ffb</code></td><td class="ok" title="717cc03e50: in prod (via linked commit), CI passed (on identical original)">✅ proven<br><code>717cc03e</code></td><td class="ok" title="c868cce393: in dev (inferred from branch), CI passed">✅ tested<br><code>c868cce3</code></td></tr><tr><td class='subj'>Raise upload limit to 25 MB (#850)<br><code>6edcd8a2</code></td><td class="miss" title="change not on this branch">⚠️ missing</td><td class="ok" title="6c5abd6048: in uat, CI passed">✅ tested<br><code>6c5abd60</code></td><td class="ok" title="6edcd8a24f: in uat (via linked commit), CI passed (on identical original)">✅ tested<br><code>6edcd8a2</code></td></tr><tr><td class='subj'>Longer sessions with expiry warning (#845)<br><code>a7920439</code></td><td class="miss" title="change not on this branch">⚠️ missing</td><td class="miss" title="change not on this branch">⚠️ missing</td><td class="unk" title="a79204399d: in dev (inferred from branch), no test record">❓ unverified<br><code>a7920439</code></td></tr>
+</table></body></html>

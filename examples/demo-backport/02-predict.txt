@@ -1,0 +1,30 @@
+$ git mm predict --pick prod dev
+Changes on prod that dev does not have yet:
+
+  CONFLICT 9bb60ffb34 Fix crash on long sessions (#812)
+           settings.py (content, 1 hunk(s))
+
+$ git mm predict prod dev
+Merging prod into dev will cause 1 conflict(s):
+
+━━━ settings.py · conflict 1 of 1 · line 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OURS  [ours: dev]
+  │ SESSION_TIMEOUT = 7200
+  │ SESSION_WARN_BEFORE_EXPIRY = True
+  a79204399d Longer sessions with expiry warning (#845)
+    by Ravi Kumar · on: dev
+    ❓ UNVERIFIED  in dev (inferred from branch), no test record
+      inferred: reachable from dev branch 'dev'
+
+THEIRS  [theirs: prod]
+  │ SESSION_TIMEOUT = 1800
+  9bb60ffb34 Fix crash on long sessions (#812)
+    by Meera Ops · on: prod
+    ✅ PROVEN  in prod, CI passed
+      recorded: deployed to prod by ci-bot at 2026-10-30T09:00:00+00:00
+      recorded: ci passed by ci-bot at 2026-10-30T09:00:00+00:00
+      inferred: reachable from prod branch 'prod'
+      inferred: [717cc03e50] its copy (same code) is on uat branch 'uat'
+
+Provenance says: Prefer THEIRS: proven vs unverified on ours. Keep any genuinely new lines from ours only after testing them.
+
