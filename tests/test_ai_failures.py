@@ -5,7 +5,7 @@ import urllib.error
 import pytest
 
 from merge_monkey import render
-from merge_monkey.ai import Gemma, _host
+from merge_monkey.ai import Gemma, _host, extract_json
 from merge_monkey.conflicts import analyze_worktree
 from merge_monkey.resolve import choose
 
@@ -146,3 +146,47 @@ def test_colour_only_on_a_terminal(monkeypatch):
     monkeypatch.setattr(render, "use_color", lambda: False)
     assert render.c("x", "red") == "x"
     assert render.verdict("SOMETHING NEW").endswith("SOMETHING NEW")
+
+
+# -- Ollama builds without structured output ----------------------------------------
+
+def test_falls_back_to_plain_text_when_json_mode_is_refused(monkeypatch):
+    client = Gemma(model="gemma4:e4b", host="http://127.0.0.1:9")
+    calls = []
+
+    def post(path, payload):
+        calls.append(payload)
+        if "format" in payload:
+            raise urllib.error.HTTPError(path, 501, "Not Implemented", {}, None)
+        return {"response": 'Here you go:\n```json\n{"same": true, "confidence": 0.9, "reason": "r"}\n```'}
+
+    monkeypatch.setattr(client, "_post", post)
+    out = client.same_change("a", "d", "b", "d")
+    assert out["same"] is True and out["confidence"] == 0.9
+    assert [("format" in c) for c in calls] == [True, False]
+    client.same_change("a", "d", "b", "d")            # remembers: no second refused call
+    assert [("format" in c) for c in calls] == [True, False, False]
+
+
+def test_other_http_errors_are_reported(monkeypatch):
+    client = Gemma(model="gemma4:e4b", host="http://127.0.0.1:9")
+
+    def post(path, payload):
+        raise urllib.error.HTTPError(path, 404, "model not found", {}, None)
+
+    monkeypatch.setattr(client, "_post", post)
+    assert client.generate_json("x") is None
+    assert "404" in client.last_error and client.json_mode is True
+
+
+@pytest.mark.parametrize("text, expected", [
+    ('{"a": 1}', {"a": 1}),
+    ('```json\n{"a": 1}\n```', {"a": 1}),
+    ('```\n{"a": 1}\n```', {"a": 1}),
+    ('Sure! {"a": {"b": 2}} Hope that helps.', {"a": {"b": 2}}),
+    ("no json here", None),
+    ("[1, 2]", None),
+    ("", None),
+])
+def test_extract_json(text, expected):
+    assert extract_json(text) == expected

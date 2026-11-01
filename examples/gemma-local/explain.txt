@@ -1,0 +1,39 @@
+$ git mm explain
+cherry-pick stopped: ours = dev (a79204399d), theirs = CHERRY_PICK_HEAD (9bb60ffb34)
+
+━━━ settings.py · conflict 1 of 1 · line 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OURS  [ours: dev]
+  │ SESSION_TIMEOUT = 7200
+  │ SESSION_WARN_BEFORE_EXPIRY = True
+  a79204399d Longer sessions with expiry warning (#845)
+    by Ravi Kumar · on: dev
+    ❓ UNVERIFIED  in dev (inferred from branch), no test record
+      inferred: reachable from dev branch 'dev'
+
+THEIRS  [theirs: CHERRY_PICK_HEAD]
+  │ SESSION_TIMEOUT = 1800
+  9bb60ffb34 Fix crash on long sessions (#812)
+    by Meera Ops · on: prod
+    ✅ PROVEN  in prod, CI passed
+      recorded: deployed to prod by ci-bot at 2026-10-30T09:00:00+00:00
+      recorded: ci passed by ci-bot at 2026-10-30T09:00:00+00:00
+      inferred: reachable from prod branch 'prod'
+      inferred: [717cc03e50] its copy (same code) is on uat branch 'uat'
+
+Provenance says: Prefer THEIRS: proven vs unverified on ours. Keep any genuinely new lines from ours only after testing them.
+
+🤖 Gemma (gemma4:e4b, local):
+   The conflict involves session timeout settings. The tested change
+   reduces the timeout to 1800, while the dev branch introduces a
+   warning flag and a longer timeout. We should combine these to keep
+   the proven timeout while adding the new warning feature.
+   Suggestion: combine — We keep the tested timeout reduction while incorporating the genuinely new warning flag.
+   Proposed text:
+   │ SESSION_TIMEOUT = 1800
+   │ SESSION_WARN_BEFORE_EXPIRY = True
+
+Next: git mm resolve --prefer tested   (or --interactive)
+
+$ ollama ps
+NAME          ID              SIZE      PROCESSOR    CONTEXT    RUNNER    UNTIL              
+gemma4:e4b    eb2177adf764    9.5 GB    100% GPU     4096       mlx       4 minutes from now    

@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import urllib.error
 import urllib.request
 
@@ -65,6 +66,26 @@ Reply with JSON only:
   "reason": "<one sentence>"}}"""
 
 
+def extract_json(text: str) -> dict | None:
+    """Parse a JSON object from a model reply, allowing ```json fences or chatter around it."""
+    text = text.strip()
+    candidates = [text]
+    fenced = re.search(r"```(?:json)?\s*(.*?)```", text, re.DOTALL)
+    if fenced:
+        candidates.append(fenced.group(1))
+    start, end = text.find("{"), text.rfind("}")
+    if 0 <= start < end:
+        candidates.append(text[start:end + 1])
+    for cand in candidates:
+        try:
+            parsed = json.loads(cand)
+        except ValueError:
+            continue
+        if isinstance(parsed, dict):
+            return parsed
+    return None
+
+
 def _host() -> str:
     host = os.environ.get("OLLAMA_HOST", DEFAULT_HOST).strip().rstrip("/")
     if not host.startswith(("http://", "https://")):
@@ -81,6 +102,7 @@ class Gemma:
         self.host = (host or _host()).rstrip("/")
         self.timeout = timeout
         self.last_error: str | None = None
+        self.json_mode = True   # Ollama's structured output; turned off if the server refuses it
 
     # -- transport --------------------------------------------------------
 
@@ -105,17 +127,27 @@ class Gemma:
         return True
 
     def generate_json(self, prompt: str) -> dict | None:
+        payload = {"model": self.model, "prompt": prompt, "stream": False,
+                   "options": {"temperature": 0.1}}
+        if self.json_mode:
+            payload["format"] = "json"
         try:
-            data = self._post("/api/generate", {
-                "model": self.model, "prompt": prompt, "stream": False,
-                "format": "json", "options": {"temperature": 0.1},
-            })
-            text = data.get("response", "")
-            parsed = json.loads(text)
-            return parsed if isinstance(parsed, dict) else None
+            data = self._post("/api/generate", payload)
+        except urllib.error.HTTPError as exc:
+            # Some Ollama builds answer "structured output is unavailable" (501)
+            # for format=json. Ask again in plain text and parse the reply.
+            if self.json_mode and exc.code in (400, 500, 501):
+                self.json_mode = False
+                return self.generate_json(prompt)
+            self.last_error = f"Gemma call failed: {exc}"
+            return None
         except (urllib.error.URLError, OSError, ValueError) as exc:
             self.last_error = f"Gemma call failed: {exc}"
             return None
+        parsed = extract_json(data.get("response", ""))
+        if parsed is None:
+            self.last_error = "Gemma call failed: reply was not a JSON object"
+        return parsed
 
     # -- tasks ------------------------------------------------------------
 
